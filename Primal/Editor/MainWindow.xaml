@@ -1,0 +1,36 @@
+﻿<Window x:Class="Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Editor"
+        mc:Ignorable="d" WindowStartupLocation="CenterScreen"
+        Title="AurEngine Editor" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <ToggleButton Content="Open"    x:Name="openProjectButton"  FontSize="32" Click="OnTggleButton_Click"/>
+            <ToggleButton Content="Home"    x:Name="homeButton"         FontSize="32" Click="OnTggle"/>
+            <ToggleButton Content="News"    x:Name="newsButton"         FontSize="32"/>
+            <ToggleButton Content="Library" x:Name="libraryButton"      FontSize="32"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <Border Width="800" Background="Gray" >
+                <TextBlock FontSize="72" Text="Home"/>
+            </Border>
+
+            <Border Width="800" Background="Gray">
+                <TextBlock FontSize="72" Text="Home"/>
+            </Border>
+
+            <Border Width="800" Background="Gray">
+                <TextBlock FontSize="72" Text="Library"/>
+            </Border>
+
+        </StackPanel>
+
+    </Grid>
+</Window>

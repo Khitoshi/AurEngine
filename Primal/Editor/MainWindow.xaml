@@ -3,34 +3,41 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Editor"
+        xmlns:local="clr-namespace:Editor" xmlns:local1="clr-namespace:Editor.Converters"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="AurEngine Editor" Height="450" Width="800">
+        xmlns:converters="clr-namespace:Editor.Converters"
+        Title="AurEngine Editor" Height="720" Width="980">
+
+    <Window.Resources>
+        <converters:SizePercentageConverter x:Key="SizePercentageConverter"/>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
-            <ToggleButton Content="Open"    x:Name="openProjectButton"  FontSize="32" Click="OnTggleButton_Click"/>
-            <ToggleButton Content="Home"    x:Name="homeButton"         FontSize="32" Click="OnTggle"/>
-            <ToggleButton Content="News"    x:Name="newsButton"         FontSize="32"/>
-            <ToggleButton Content="Library" x:Name="libraryButton"      FontSize="32"/>
+
+        <StackPanel Orientation="Horizontal" Margin="0" >
+            <!--<ToggleButton Content="Open"    x:Name="openProjectButton"/>-->
+            <ToggleButton Content="Home" x:Name="homeButton" Click="HomeButton_Click"
+                          Width="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualWidth, Converter={StaticResource SizePercentageConverter}, ConverterParameter='20'}"
+                          Height="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualHeight, Converter={StaticResource SizePercentageConverter}, ConverterParameter='11'}"
+                          Padding="0"/>
+
+            <ToggleButton Content="News" x:Name="newsButton" Click="NewsButton_Click"
+                          Width="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualWidth, Converter={StaticResource SizePercentageConverter}, ConverterParameter='20'}"
+                          Height="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualHeight, Converter={StaticResource SizePercentageConverter}, ConverterParameter='11'}"
+                          Padding="0"/>
+
+            <ToggleButton Content="Library" x:Name="libraryButton" Click="LibraryButton_Click"
+                          Width="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualWidth, Converter={StaticResource SizePercentageConverter}, ConverterParameter='20'}"
+                          Height="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualHeight, Converter={StaticResource SizePercentageConverter}, ConverterParameter='11'}"
+                          Padding="0"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <Border Width="800" Background="Gray" >
-                <TextBlock FontSize="72" Text="Home"/>
-            </Border>
 
-            <Border Width="800" Background="Gray">
-                <TextBlock FontSize="72" Text="Home"/>
-            </Border>
-
-            <Border Width="800" Background="Gray">
-                <TextBlock FontSize="72" Text="Library"/>
-            </Border>
-
-        </StackPanel>
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Grid.Row="1"/>
 
     </Grid>
 </Window>
+

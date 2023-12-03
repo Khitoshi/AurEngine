@@ -1,4 +1,5 @@
 ﻿using Editor.GameProject;
+using Editor.Pages;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,12 +21,13 @@ namespace Editor
         public MainWindow()
         {
             InitializeComponent();
-            Loaded += OnMainWindowLoaded;
+            this.Loaded += OnMainWindowLoaded;
+            this.SizeChanged += MainWindow_SizeChanged;
         }
 
         private void OnMainWindowLoaded(object sender, RoutedEventArgs e)
         {
-            Loaded -= OnMainWindowLoaded;
+            this.Loaded -= OnMainWindowLoaded;
             OpenProjectBrowserDialog();
         }
 
@@ -43,9 +45,54 @@ namespace Editor
 
         }
 
-        private void openProjectButton_Click(object sender, RoutedEventArgs e)
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
+            newsButton.IsChecked = false;
+            libraryButton.IsChecked = false;
+            MainFrame.Navigate(new Home());
+        }
+
+        private void NewsButton_Click(object sender, RoutedEventArgs e)
+        {
+            homeButton.IsChecked = false;
+            libraryButton.IsChecked = false;
+            MainFrame.Navigate(new News());
+        }
+
+        private void LibraryButton_Click(object sender, RoutedEventArgs e)
+        {
+            homeButton.IsChecked = false;
+            newsButton.IsChecked = false;
+            MainFrame.Navigate(new Library());
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateButtonSizes();
+
+            if (MainFrame.Content is Library libraryPage)
+            {
+                libraryPage.SetParentWindowSize(this.ActualWidth, this.ActualHeight);
+            }
+        }
+
+        private void UpdateButtonSizes()
+        {
+            double width = this.ActualWidth / 5;
+            double height = this.ActualHeight / 9;
+
+            homeButton.Width = width;
+            homeButton.Height = height;
+
+            libraryButton.Width = width;
+            libraryButton.Height = height;
+
+            newsButton.Width = width;
+            newsButton.Height = height;
 
         }
+
+
+
     }
 }

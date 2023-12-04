@@ -12,6 +12,12 @@ namespace Editor.Util
 {
     public static class Serializer
     {
+        /// <summary>
+        /// Serialize to file
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="instance"></param>
+        /// <param name="path"></param>
         public static void ToFile<T>(T instance, string path)
         {
             try
@@ -27,9 +33,12 @@ namespace Editor.Util
             }
         }
 
-
-
-
+        /// <summary>
+        /// Deserialize from file
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
         internal static T FromFile<T>(string path)
         {
             try

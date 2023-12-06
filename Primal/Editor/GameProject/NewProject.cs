@@ -18,17 +18,17 @@ namespace Editor.GameProject
     public class ProjectTemplate
     {
         [DataMember]
-        public string ProjectType { get; set; }
+        public required string ProjectType { get; set; }
         [DataMember]
-        public string ProjectFile { get; set; }
+        public required string ProjectFile { get; set; }
         [DataMember]
-        public List<String> Folders { get; set; }
+        public required List<String> Folders { get; set; }
 
-        public Byte[] Icon { get; set; }
-        public string IconFilePath { get; set; }
-        public Byte[] Screenshot { get; set; }
-        public string ScreenshotFilePath { get; set; }
-        public string ProjectFilePath { get; set; }
+        public required Byte[] Icon { get; set; }
+        public required string IconFilePath { get; set; }
+        public required Byte[] Screenshot { get; set; }
+        public required string ScreenshotFilePath { get; set; }
+        public required string ProjectFilePath { get; set; }
     }
 
     internal class NewProject : ViewModelBase
@@ -45,10 +45,7 @@ namespace Editor.GameProject
                 if (_projectName != value)
                 {
                     _projectName = value;
-                    //TODO This code ignores the DRY principle.
-                    ErrorMessage = string.Empty;
-                    ValidateProjectPath();
-                    ValidateProjectName();
+                    SetupValidation();
                     OnPropertyChanged(nameof(ProjectName));
                 }
             }
@@ -63,10 +60,7 @@ namespace Editor.GameProject
                 if (_projectPath != value)
                 {
                     _projectPath = value;
-                    //TODO This code ignores the DRY principle.
-                    ErrorMessage = string.Empty;
-                    ValidateProjectPath();
-                    ValidateProjectName();
+                    SetupValidation();
                     OnPropertyChanged(nameof(ProjectPath));
                 }
             }
@@ -101,7 +95,7 @@ namespace Editor.GameProject
                 {
                     _isNameValid = value;
                     OnPropertyChanged(nameof(_isNameValid));
-                    OnPropertyChanged(nameof(IsVisible)); // IsVisibleの更新を通知
+                    OnPropertyChanged(nameof(IsVisible));
                 }
             }
         }
@@ -114,7 +108,7 @@ namespace Editor.GameProject
             }
         }
 
-        private string _errorMessage;
+        private string _errorMessage = string.Empty;
         public string ErrorMessage
         {
             get { return _errorMessage; }
@@ -128,42 +122,14 @@ namespace Editor.GameProject
             }
         }
 
-
-
         public NewProject()
         {
-
             ProjectTemplates = new ReadOnlyObservableCollection<ProjectTemplate>(_projectTemplates);
 
             try
             {
-                //project templates are stored in a folder structure
-                var templateFiles = Directory.GetFiles(_templatePath, "template.xml", SearchOption.AllDirectories);
-                Debug.Assert(templateFiles.Any());
-                foreach (var file in templateFiles)
-                {
-                    //deserialize the template
-                    var template = Serializer.FromFile<ProjectTemplate>(file);
-
-                    //get the folder path of the template
-                    var filePath = Path.GetDirectoryName(file);
-                    if (filePath == String.Empty || String.IsNullOrEmpty(filePath)) continue;
-
-                    //get the icon and screenshot
-                    template.IconFilePath = Path.GetFullPath(Path.Combine(filePath, "Icon.png"));
-                    template.Icon = File.ReadAllBytes(template.IconFilePath);
-                    template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(filePath, "Screenshot.png"));
-                    template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
-
-                    //get the project file
-                    template.ProjectFilePath = Path.GetFullPath(Path.Combine(filePath, template.ProjectFile));
-
-                    _projectTemplates.Add(template);
-                }
-                //TODO This code ignores the DRY principle.
-                ErrorMessage = string.Empty;
-                ValidateProjectPath();
-                ValidateProjectName();
+                InitializeTemplates();
+                SetupValidation();
             }
             catch (Exception ex)
             {
@@ -172,73 +138,90 @@ namespace Editor.GameProject
             }
         }
 
-        /// <summary>
-        /// check if the project path is valid
-        /// </summary>
-        /// <returns>
-        ///  success: true
-        ///  failure: false
-        /// </returns>
+        private void InitializeTemplates()
+        {
+            var templateFiles = Directory.GetFiles(_templatePath, "template.xml", SearchOption.AllDirectories);
+            Debug.Assert(templateFiles.Any());
+
+            foreach (var file in templateFiles)
+            {
+                var template = LoadTemplate(file);
+                if (template != null) _projectTemplates.Add(template);
+            }
+        }
+
+        private ProjectTemplate LoadTemplate(string file)
+        {
+            if (String.IsNullOrEmpty(file)) return null;
+
+            var filePath = Path.GetDirectoryName(file);
+            if (String.IsNullOrEmpty(filePath)) return null;
+
+            //get the icon ,screenshot and project file
+            var template = Serializer.FromFile<ProjectTemplate>(file);
+            template.IconFilePath = Path.GetFullPath(Path.Combine(filePath, "Icon.png"));
+            template.Icon = File.ReadAllBytes(template.IconFilePath);
+            template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(filePath, "Screenshot.png"));
+            template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
+            template.ProjectFilePath = Path.GetFullPath(Path.Combine(filePath, template.ProjectFile));
+
+            return template;
+        }
+
+        private void SetupValidation()
+        {
+            ErrorMessage = string.Empty;
+            ValidateProjectPath();
+            ValidateProjectName();
+        }
+
         private bool ValidateProjectPath()
         {
             var path = ProjectPath;
             if (!Path.EndsInDirectorySeparator(path)) path += @"\";
             path += $@"{ProjectName}\";
 
-            IsPathValid = false;
+            IsPathValid = true;
             if (string.IsNullOrWhiteSpace(ProjectPath.Trim()))
-            {//null or whitespace exists
+            {
                 ErrorMessage = "Select a valid project folder.";
+                IsPathValid = false;
             }
             else if (ProjectPath.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-            {//invalid characters in the path
+            {
                 ErrorMessage = "Invalid character(s) used in project path.";
+                IsPathValid = false;
             }
             else if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any())
-            {//project folder exists and is not empty
+            {
                 ErrorMessage = "Selected project folder already exists and is not empty.";
-            }
-            else
-            {//success
-                IsPathValid = true;
+                IsPathValid = false;
             }
             return IsPathValid;
         }
 
-        /// <summary>
-        /// check if the project name is valid
-        /// </summary>
-        /// <returns>
-        ///  success: true
-        ///  failure: false
-        /// </returns>
         private bool ValidateProjectName()
         {
             var nameRegex = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$");
 
-            IsNameValid = false;
+            IsNameValid = true;
             if (string.IsNullOrWhiteSpace(ProjectName.Trim()))
-            {// null or whitespace exists
+            {
                 ErrorMessage = "Type in a project name.";
+                IsNameValid = false;
             }
             else if (!nameRegex.IsMatch(ProjectName))
-            {//invalid characters in the name
+            {
                 ErrorMessage = "Invalid character(s) used in project name.";
+                IsNameValid = false;
             }
-            else
-            {//success
-                IsNameValid = true;
-            }
+
             return IsNameValid;
         }
 
         public string CreateProject(ProjectTemplate template)
         {
-            //check if the project path and name is valid
-            //TODO This code ignores the DRY principle.
-            ErrorMessage = string.Empty;
-            ValidateProjectPath();
-            ValidateProjectName();
+            SetupValidation();
             if (!IsPathValid || !IsNameValid) return string.Empty;
 
             //create the project folder structure

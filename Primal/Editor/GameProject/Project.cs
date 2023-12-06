@@ -52,13 +52,6 @@ namespace Editor.GameProject
             OnDeserialized(new StreamingContext());
         }
 
-        /// <summary>
-        /// Load a project from a file
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns>
-        /// The loaded project
-        /// </returns>
         public static Project Load(string path)
         {
             Debug.Assert(File.Exists(path));
@@ -69,32 +62,20 @@ namespace Editor.GameProject
         {
         }
 
-        /// <summary>
-        /// Save a project to a file
-        /// </summary>
-        /// <param name="project"></param>
         public void Save(Project project)
         {
             Serializer.ToFile(project, project.FullPath);
         }
 
-        /// <summary>
-        /// Method to be executed after deserialization is complete
-        /// </summary>
-        /// <param name="context"></param>
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
             if (_scenes == null) return;
 
-            // Convert a list of deserialized scenes into a RedOnlyObservableCollection
             Scenes = new ReadOnlyObservableCollection<Scene>(_scenes);
             OnPropertyChanged(nameof(_scenes));
 
-            // Set the active scene to the first scene that is active
             Scenes.FirstOrDefault(p => p.IsActive);
         }
-
-
     }
 }

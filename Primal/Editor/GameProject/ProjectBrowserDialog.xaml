@@ -11,7 +11,7 @@
         <!--
         <local:NewProjectView/>
         -->
-        <local:OpenProjectView/>
+        <local:OpenProjectView />
     </StackPanel>
 </Window>
 

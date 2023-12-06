@@ -38,14 +38,6 @@
             </Border>
         </StackPanel>
 
-        <!--
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
-            <TextBlock Text="Path" Width="50"/>
-            <TextBox Width="500" Text="{Binding SelectedItem.ProjectPath}"/>
-            <Button Content="Browse" Width="45" Margin="5,0,0,0"/>
-        </StackPanel>
-        -->
-
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
             <Button Content="Create" Width="96" IsDefault="True" Click="OnOpen_Button_Click"/>
             <Button Content="Exit" Width="96" Margin="30,0,0,0" IsCancel="True"/>

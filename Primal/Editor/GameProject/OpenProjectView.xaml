@@ -8,22 +8,46 @@
             d:DataContext="{d:DesignInstance Type=local:OpenProject, IsDesignTimeCreatable=True}"
             d:DesignHeight="450" d:DesignWidth="800">
 
+    <UserControl.DataContext>
+        <local:OpenProject/>
+    </UserControl.DataContext>
+
     <StackPanel Background="Gray">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <ListBox Width="195" Height="250"/>
-            <Border Width="400" Height="250" Margin="5,0,0,0"/>
+            <ListBox x:Name="projectListBox" Width="195" Height="250" ItemsSource="{Binding Projects}" SelectedIndex="0">
+
+                <ListBox.ItemContainerStyle >
+                    <Style TargetType="ListBoxItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="OnListBoxItem_Mouse_DoubleClick"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source ="{Binding Icon}" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding ProjectName}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Border Width="400" Height="250" Margin="5,0,0,0">
+                <Border.Background>
+                    <ImageBrush ImageSource="{Binding Path=SelectedItem.Screenshot, ElementName=projectListBox}"/>
+                </Border.Background>
+            </Border>
         </StackPanel>
 
-
+        <!--
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
             <TextBlock Text="Path" Width="50"/>
-            <TextBox Width="500"/>
+            <TextBox Width="500" Text="{Binding SelectedItem.ProjectPath}"/>
             <Button Content="Browse" Width="45" Margin="5,0,0,0"/>
         </StackPanel>
-
+        -->
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
-            <Button Content="Create" Width="96" IsDefault="True"/>
+            <Button Content="Create" Width="96" IsDefault="True" Click="OnOpen_Button_Click"/>
             <Button Content="Exit" Width="96" Margin="30,0,0,0" IsCancel="True"/>
         </StackPanel>
 

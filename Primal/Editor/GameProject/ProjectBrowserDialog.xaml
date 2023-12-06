@@ -8,8 +8,10 @@
         Title="NewProjectBrowserDialog" Height="450" Width="800">
 
     <StackPanel>
+        <!--
         <local:NewProjectView/>
-        <!--<local:OpenProject/>-->
+        -->
+        <local:OpenProjectView/>
     </StackPanel>
 </Window>
 

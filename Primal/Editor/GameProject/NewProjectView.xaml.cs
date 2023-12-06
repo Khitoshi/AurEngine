@@ -23,19 +23,34 @@ namespace Editor.GameProject
         public NewProjectView()
         {
             InitializeComponent();
-
         }
 
+        /// <summary>
+        /// Create a new project using the selected template
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnCreate_Button_Click(object sender, RoutedEventArgs e)
         {
+            //Get NewProject view model from DataContext
             var vm = DataContext as NewProject;
+
+            //Create a new project using the selected template and get its path
             var projectPath = vm.CreateProject(templateListBox.SelectedItem as ProjectTemplate);
-            bool dialogResult = false;
+
+            //Get the window that contains this view
             var win = Window.GetWindow(this);
+
+            //Set the dialog result to true if the project path is not null or empty
+            bool dialogResult = false;
             if (!string.IsNullOrEmpty(projectPath))
-            {
+            {//Open the project and set the window's DataContext to the project
                 dialogResult = true;
+                var project = OpenProject.Open(new ProjectData() { ProjectPath = projectPath, ProjectName = vm.ProjectName });
+                win.DataContext = project;
             }
+
+            //Close the window
             win.DialogResult = dialogResult;
             win.Close();
         }

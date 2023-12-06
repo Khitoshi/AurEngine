@@ -184,7 +184,6 @@ namespace Editor.GameProject
             var path = ProjectPath;
             if (!Path.EndsInDirectorySeparator(path)) path += @"\";
             path += $@"{ProjectName}\";
-            var nameRegex = new Regex(@"^[A-Za-z_][A-Za-z0-9_]*$");
 
             IsPathValid = false;
             if (string.IsNullOrWhiteSpace(ProjectPath.Trim()))
@@ -198,10 +197,6 @@ namespace Editor.GameProject
             else if (Directory.Exists(path) && Directory.EnumerateFileSystemEntries(path).Any())
             {//project folder exists and is not empty
                 ErrorMessage = "Selected project folder already exists and is not empty.";
-            }
-            else if (!nameRegex.IsMatch(ProjectPath))
-            {//invalid characters in the path
-                ErrorMessage = "Invalid character(s) used in project path.";
             }
             else
             {//success

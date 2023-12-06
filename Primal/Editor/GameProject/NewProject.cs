@@ -222,7 +222,7 @@ namespace Editor.GameProject
         public string CreateProject(ProjectTemplate template)
         {
             SetupValidation();
-            if (!IsPathValid || !IsNameValid) return string.Empty;
+            if (!IsVisible) return string.Empty;
 
             //create the project folder structure
             if (!Path.EndsInDirectorySeparator(ProjectPath)) ProjectPath += @"\";

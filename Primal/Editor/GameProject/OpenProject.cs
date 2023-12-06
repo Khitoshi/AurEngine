@@ -61,9 +61,9 @@ namespace Editor.GameProject
             }
         }
 
-        private static ReadOnlyObservableCollection<ProjectData> ReadProjectData()
+        private static void ReadProjectData()
         {
-            if (!File.Exists(_projectDataPath)) return ReadOnlyObservableCollection<ProjectData>.Empty;
+            if (!File.Exists(_projectDataPath)) return;
 
             var projects = Serializer.FromFile<ProjectDataList>(_projectDataPath).Projects.OrderByDescending(p => p.LastOpened);
             _projects.Clear();
@@ -78,7 +78,6 @@ namespace Editor.GameProject
 
                 _projects.Add(project);
             }
-            return Projects;
         }
 
         public static Project Open(ProjectData data)

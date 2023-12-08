@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Editor.GameProject;
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,15 @@ namespace Editor.Editors
         public WorldEditorView()
         {
             InitializeComponent();
+            Loaded += WorldEditorView_Loaded;
+        }
+
+        private void WorldEditorView_Loaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= WorldEditorView_Loaded;
+            Focus();
+            ((INotifyCollectionChanged)Project.UndoRedo.UndoList).CollectionChanged += (s, e) => Focus();
+            //((INotifyCollectionChanged)Project.UndoRedo.RedoList).CollectionChanged += (s, e) => Focus();
         }
     }
 }

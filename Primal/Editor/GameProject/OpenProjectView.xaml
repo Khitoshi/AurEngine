@@ -33,6 +33,17 @@
                 </Border.Background>
             </Border>
         </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0" >
+            <TextBlock Text="Name:" Width="50"/>
+            <TextBlock Text="{Binding SelectedItem.ProjectName, ElementName=projectsListBox}" Width="550" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+            <TextBlock Text="Path: " Width="50"/>
+            <TextBlock Text="{Binding SelectedItem.FullPath, ElementName=projectsListBox}" Width="550" />
+        </StackPanel>
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
                     Margin="0,30,0,0">
             <Button Content="Open" Width="96" IsDefault="True" Click="OnOpen_Button_Click"/>

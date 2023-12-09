@@ -36,7 +36,7 @@ namespace Editor
             var projectBrowser = new ProjectBrowserDialog();
             if (projectBrowser.ShowDialog() == false || projectBrowser.DataContext == null)
             {
-                //Application.Current.Shutdown();
+                Application.Current.Shutdown();
             }
             else
             {

@@ -8,14 +8,14 @@
         Title="NewProjectBrowserDialog" Height="500" Width="800">
 
     <StackPanel>
-        <TabControl SelectedIndex="1">
+        <TabControl x:Name="projectViewTab">
 
-            <TabItem Header="Open Project">
-                <local:OpenProjectView/>
+            <TabItem Header="Open Project" x:Name="openProjectView">
+                <local:OpenProjectView />
             </TabItem>
 
-            <TabItem Header="New Project">
-                <local:NewProjectView/>
+            <TabItem Header="New Project" x:Name="newProjectView">
+                <local:NewProjectView />
             </TabItem>
 
         </TabControl>

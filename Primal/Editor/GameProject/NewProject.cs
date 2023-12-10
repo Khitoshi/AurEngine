@@ -133,8 +133,9 @@ namespace Editor.GameProject
             }
             catch (Exception ex)
             {
-                //TODO: log error
-                Debug.WriteLine(ex);
+                Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to create {ProjectName}");
+                throw;
             }
         }
 
@@ -250,8 +251,9 @@ namespace Editor.GameProject
             }
             catch (Exception ex)
             {
-                //TODO log error
-                return string.Empty;
+                Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to Create to {ProjectName}");
+                throw;
             }
         }
 

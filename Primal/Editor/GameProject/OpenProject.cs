@@ -55,8 +55,8 @@ namespace Editor.GameProject
             }
             catch (Exception ex)
             {
-                //TODO: log error
                 Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to open data {_applicationDataPath}");
                 throw;
             }
         }

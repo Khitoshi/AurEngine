@@ -40,11 +40,9 @@ namespace Editor.Util
     static class Logger
     {
         private static int _messageFilter = (int)(MessageType.Info | MessageType.Warning | MessageType.Error);
-        private static ObservableCollection<LogMessage> _messages = new ObservableCollection<LogMessage>();
-        public static ReadOnlyObservableCollection<LogMessage> Messages
-        { get; } = new ReadOnlyObservableCollection<LogMessage>(_messages);
-        public static CollectionViewSource FilteredMessages
-        { get; } = new CollectionViewSource() { Source = Messages };
+        private static readonly ObservableCollection<LogMessage> _messages = [];
+        public static ReadOnlyObservableCollection<LogMessage> Messages { get; } = new ReadOnlyObservableCollection<LogMessage>(_messages);
+        public static CollectionViewSource FilteredMessages { get; } = new CollectionViewSource() { Source = Messages };
 
         static Logger()
         {
@@ -53,6 +51,19 @@ namespace Editor.Util
                 var type = (int)(e.Item as LogMessage).MessageType;
                 e.Accepted = (type & _messageFilter) != 0;
             };
+
+            Log(MessageType.Error, "Test Error Message01");
+            Log(MessageType.Info, "Test Info Message01");
+            Log(MessageType.Warning, "Test Warning Message01");
+
+            Log(MessageType.Error, "Test Error Message02");
+            Log(MessageType.Info, "Test Info Message02");
+            Log(MessageType.Warning, "Test Warning Message02");
+
+            Log(MessageType.Error, "Test Error Message03");
+            Log(MessageType.Info, "Test Info Message03");
+            Log(MessageType.Warning, "Test Warning Message03");
+
         }
 
         public static async void Log(MessageType type, string msg,

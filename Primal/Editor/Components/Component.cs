@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 
 namespace Editor.Components
 {
+    interface IMSComponent { }
+
     [DataContract]
     class Component : ViewModelBase
     {
+
         [DataMember]
         public GameEntity Owner { get; private set; }
 
@@ -20,4 +23,7 @@ namespace Editor.Components
             Owner = owner;
         }
     }
+
+    abstract class MSComponent<T> : ViewModelBase, IMSComponent where T : Component
+    { }
 }

@@ -12,6 +12,12 @@ namespace Editor.Util
 {
     public static class Serializer
     {
+        /// <summary>
+        /// Serialize to file
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="instance"></param>
+        /// <param name="path"></param>
         public static void ToFile<T>(T instance, string path)
         {
             try
@@ -22,14 +28,18 @@ namespace Editor.Util
             }
             catch (Exception ex)
             {
-                //TODO: log error
-                Debug.WriteLine(ex);
+                Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to Serialize {path}");
+                throw;
             }
         }
 
-
-
-
+        /// <summary>
+        /// Deserialize from file
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
         internal static T FromFile<T>(string path)
         {
             try
@@ -41,9 +51,9 @@ namespace Editor.Util
             }
             catch (Exception ex)
             {
-                //TODO: log error
-                Debug.WriteLine(ex);
-                return default(T);
+                Debug.WriteLine(ex.Message);
+                Logger.Log(MessageType.Error, $"Failed to Deserialize {path}");
+                throw;
             }
         }
     }

@@ -22,7 +22,16 @@ namespace Editor.GameProject
         public ProjectBrowserDialog()
         {
             InitializeComponent();
+            Loaded += ProjectBrowserDialog_Loaded;
         }
 
+        private void ProjectBrowserDialog_Loaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= ProjectBrowserDialog_Loaded;
+            if (OpenProject.Projects.Any()) return;
+
+            openProjectView.IsEnabled = false;
+            projectViewTab.SelectedIndex = 1;
+        }
     }
 }

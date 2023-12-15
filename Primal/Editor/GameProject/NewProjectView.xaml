@@ -4,17 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editor.GameProject"
-             d:DataContext="{d:DesignInstance Type=local:NewProject, IsDesignTimeCreatable=True}"
              mc:Ignorable="d" >
 
     <UserControl.DataContext>
         <local:NewProject/>
     </UserControl.DataContext>
 
-    <StackPanel Background="Gray">
+    <StackPanel Background="White">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
-            <ListBox x:Name="templateListBox" Width="195" Height="250" ItemsSource="{Binding ProjectTemplates}" SelectedIndex="0" >
+            <ListBox x:Name="templateListBox" Width="195" Height="250" ItemsSource="{Binding ProjectTemplates}" SelectedIndex="0"  >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -35,21 +34,21 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
             <TextBlock Text="Name" Width="50"/>
-            <TextBox Text="{Binding ProjectName}" Width="550" />
+            <TextBox Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}" Width="550" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
             <TextBlock Text="Path" Width="50"/>
-            <TextBox Text="{Binding ProjectPath}" Width="500"/>
+            <TextBox Text="{Binding ProjectPath, UpdateSourceTrigger=PropertyChanged}" Width="500"/>
             <Button Content="Browse" Width="45" Margin="5,0,0,0"/>
         </StackPanel>
 
+        <TextBlock Text="{Binding ErrorMessage}" Margin="0,20,0,0" HorizontalAlignment="Center"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
-            <Button Content="Create" Width="96" IsDefault="True"/>
+            <Button Content="Create" Width="96" IsDefault="True" IsEnabled="{Binding IsVisible }" Click="OnCreate_Button_Click"/>
             <Button Content="Exit" Width="96" Margin="30,0,0,0" IsCancel="True"/>
         </StackPanel>
-
 
     </StackPanel>
 </UserControl>

@@ -9,16 +9,16 @@
 
 using namespace aur;
 
-class engine_test : public test
+class engine_test
 {
 public:
-	bool initialize() override
+	bool initialize()
 	{
 		srand((u32)time(nullptr));
 		return true;
 	}
 
-	void run() override
+	void run()
 	{
 		do {
 			for (u32 i{ 0 }; i < 10000; ++i)
@@ -31,7 +31,7 @@ public:
 		} while (getchar() != 'q');
 	}
 
-	void shutdown() override
+	void shutdown()
 	{ }
 
 private:

@@ -86,7 +86,6 @@ namespace Editor.GameProject
                 var entityIndex = _gameEntities.Count - 1;
                 Project.UndoRedo.Add(new UndoRedoAction(
                     () => RemoveGameEnity(x),
-                    //() => _gameEntities.Insert(entityIndex, x),
                     () => AddGameEnity(x, entityIndex),
                     $"Add {x.Name} to {Name}"));
             });
@@ -105,7 +104,6 @@ namespace Editor.GameProject
         private void AddGameEnity(GameEntity entity, int index = -1)
         {
             Debug.Assert(!_gameEntities.Contains(entity));
-            //_gameEntities.Add(entity);
             entity.IsActive = IsActive;
             if (index == -1)
             {

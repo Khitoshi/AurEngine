@@ -75,13 +75,19 @@ namespace Editor.GameProject
                 OnPropertyChanged(nameof(GameEntities));
             }
 
+            foreach (var entity in _gameEntities)
+            {
+                entity.IsActive = IsActive;
+            }
+
             AddGameEntityCommand = new RelayCommand<GameEntity>(x =>
             {
                 AddGameEnity(x);
                 var entityIndex = _gameEntities.Count - 1;
                 Project.UndoRedo.Add(new UndoRedoAction(
                     () => RemoveGameEnity(x),
-                    () => _gameEntities.Insert(entityIndex, x),
+                    //() => _gameEntities.Insert(entityIndex, x),
+                    () => AddGameEnity(x, entityIndex),
                     $"Add {x.Name} to {Name}"));
             });
 
@@ -96,15 +102,25 @@ namespace Editor.GameProject
             });
         }
 
-        private void AddGameEnity(GameEntity entity)
+        private void AddGameEnity(GameEntity entity, int index = -1)
         {
             Debug.Assert(!_gameEntities.Contains(entity));
-            _gameEntities.Add(entity);
+            //_gameEntities.Add(entity);
+            entity.IsActive = IsActive;
+            if (index == -1)
+            {
+                _gameEntities.Add(entity);
+            }
+            else
+            {
+                _gameEntities.Insert(index, entity);
+            }
         }
 
         private void RemoveGameEnity(GameEntity entity)
         {
             Debug.Assert(_gameEntities.Contains(entity));
+            entity.IsActive = false;
             _gameEntities.Remove(entity);
         }
     }

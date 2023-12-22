@@ -34,7 +34,7 @@ namespace Editor.GameProject
     internal class NewProject : ViewModelBase
     {
         //TODO: get the path from the installation location
-        private readonly string _templatePath = @"..\..\ProjectTemplates\";
+        private readonly string _templatePath = @"..\..\Editor\ProjectTemplates\";
 
         private string _projectName = "NewProject";
         public string ProjectName
@@ -225,7 +225,6 @@ namespace Editor.GameProject
             SetupValidation();
             if (!IsVisible) return string.Empty;
 
-            //create the project folder structure
             if (!Path.EndsInDirectorySeparator(ProjectPath)) ProjectPath += @"\";
             var path = $@"{ProjectPath}{ProjectName}\";
 

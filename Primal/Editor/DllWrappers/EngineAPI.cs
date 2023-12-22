@@ -39,9 +39,6 @@ namespace Editor.DllWrappers
         {
             GameEntityDescriptor desc = new GameEntityDescriptor();
 
-            var flag = File.Exists(_dllName);
-            var flag2 = File.Exists("EngineDLL.dll");
-            var path = Directory.GetCurrentDirectory();
             //transform component
             {
                 var c = entity.GetComponent<Transform>();

@@ -9,6 +9,7 @@
 
     <UserControl.ContextMenu>
         <ContextMenu>
+            <MenuItem Header="Clear" x:Name="contextMenu_Clear" />
             <MenuItem Header="Info" IsCheckable="True" IsChecked="True"
                         x:Name="contextMenu_Info" />
             <MenuItem Header="Warn" IsCheckable="True" IsChecked="True"

@@ -12,7 +12,7 @@
         <KeyBinding Command="{Binding RedoCommand}" Key="Y" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
     </UserControl.InputBindings>
-    <Grid Background="Gray">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition/>

@@ -47,9 +47,9 @@
     </Window.Resources>
 
     <StackPanel>
-        <TabControl x:Name="projectViewTab" Background="{StaticResource Editor.Window.GrayBrush4}">
+        <TabControl x:Name="projectViewTab" Background="{StaticResource Editor.Window.GrayBrush2}">
 
-            <TabItem Header="Open Project" x:Name="openProjectView">
+            <TabItem Header="Open Project" x:Name="openProjectView" >
                 <local:OpenProjectView />
             </TabItem>
 
@@ -60,5 +60,3 @@
         </TabControl>
     </StackPanel>
 </Window>
-
-<!-- :local="clr-namespace:Editor.GameProject" -->

@@ -22,7 +22,7 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="{Binding Icon}" Margin="0,0,5,0"/>
-                                <TextBlock Text="{Binding ProjectType}"/>
+                                <TextBlock Text="{Binding ProjectType}" FontSize="18" FontFamily="Bahnschrift condensed" VerticalAlignment="Center"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -44,14 +44,11 @@
                 <TextBox Width="500" Text="{Binding ProjectPath, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Content="Browse" Width="45" Margin="5,0,0,0"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
-                    Margin="0,30,0,0">
-                <Button Content="Create" Width="96" IsDefault="True" IsEnabled="{Binding IsVisible}"
-                    Click="OnCreate_Button_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
+                <Button Content="Create" Width="96" IsDefault="True" IsEnabled="{Binding IsVisible}" Click="OnCreate_Button_Click"/>
                 <Button Content="Exit" Width="96" Margin="30,0,0,0" IsCancel="True"/>
             </StackPanel>
-            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource Editor.RedBrush}"
-                       Margin="0,0,0,0" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource Editor.RedBrush}" Margin="0,0,0,0" HorizontalAlignment="Center"/>
         </StackPanel>
     </Border>
 </UserControl>

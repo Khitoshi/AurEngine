@@ -26,10 +26,14 @@ namespace Editor.Util
         {
             InitializeComponent();
 
+            contextMenu_Clear.Click += (_, _) => Logger.Clear();
+
             contextMenu_Info.Checked += (_, _) => MessageFilter_Changes();
             contextMenu_Info.Unchecked += (_, _) => MessageFilter_Changes();
+
             contextMenu_Warnings.Checked += (_, _) => MessageFilter_Changes();
             contextMenu_Warnings.Unchecked += (_, _) => MessageFilter_Changes();
+
             contextMenu_Errors.Checked += (_, _) => MessageFilter_Changes();
             contextMenu_Errors.Unchecked += (_, _) => MessageFilter_Changes();
         }

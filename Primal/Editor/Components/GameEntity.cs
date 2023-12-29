@@ -43,10 +43,9 @@ namespace Editor.Components
                         EntityId = EngineAPI.CreateGameEntity(this);
                         Debug.Assert(ID.IsValid(_entityId));
                     }
-                    else if (ID.IsValid(EntityId))
+                    else
                     {
                         EngineAPI.RemoveGameEntity(this);
-                        EntityId = ID.INVALID_ID;
                     }
 
                     OnPropertyChanged(nameof(IsActive));
@@ -149,11 +148,6 @@ namespace Editor.Components
         private readonly ObservableCollection<IMSComponent> _components = new ObservableCollection<IMSComponent>();
         public ReadOnlyObservableCollection<IMSComponent> Components { get; }
 
-        public T GetMSComponent<T>() where T : IMSComponent
-        {
-            return (T)Components.FirstOrDefault(x => x.GetType() == typeof(T));
-        }
-
         public List<GameEntity> SelectedEntities { get; }
 
         public MSEntity(List<GameEntity> entities)
@@ -164,39 +158,43 @@ namespace Editor.Components
             PropertyChanged += (s, e) => { if (_enableUpdates) UpdateGameEntities(e.PropertyName); };
         }
 
-        private void MakeComponentList()
+        public static float? GetMixedValue(List<GameEntity> entities, Func<GameEntity, float> getProperty)
         {
-            _components.Clear();
-            var firstEntity = SelectedEntities.FirstOrDefault();
-            if (firstEntity == null) return;
-
-            foreach (var component in firstEntity.Components)
+            var value = getProperty(entities.First());
+            foreach (var entity in entities.Skip(1))
             {
-                var type = component.GetType();
-                if (!SelectedEntities.Skip(1).Any(entity => entity.GetComponent(type) == null))
+                if (!value.IsTheSameAs(getProperty(entity)))
                 {
-                    Debug.Assert(Components.FirstOrDefault(x => x.GetType() == type) == null);
-                    _components.Add(component.GetMultiselectionComponent(this));
+                    return null;
                 }
             }
+            return value;
         }
 
-        public static float? GetMixedValue<T>(List<T> objects, Func<T, float> getProperty)
+        public static bool? GetMixedValue(List<GameEntity> entities, Func<GameEntity, bool> getProperty)
         {
-            var value = getProperty(objects.First());
-            return objects.Skip(1).Any(x => !getProperty(x).IsTheSameAs(value)) ? (float?)null : value;
+            var value = getProperty(entities.First());
+            foreach (var entity in entities.Skip(1))
+            {
+                if (value != getProperty(entity))
+                {
+                    return null;
+                }
+            }
+            return value;
         }
 
-        public static bool? GetMixedValue<T>(List<T> objects, Func<T, bool> getProperty)
+        public static string GetMixedValue(List<GameEntity> entities, Func<GameEntity, string> getProperty)
         {
-            var value = getProperty(objects.First());
-            return objects.Skip(1).Any(x => value != getProperty(x)) ? (bool?)null : value;
-        }
-
-        public static string GetMixedValue<T>(List<T> objects, Func<T, string> getProperty)
-        {
-            var value = getProperty(objects.First());
-            return objects.Skip(1).Any(x => value != getProperty(x)) ? null : value;
+            var value = getProperty(entities.First());
+            foreach (var entity in entities.Skip(1))
+            {
+                if (value != getProperty(entity))
+                {
+                    return null;
+                }
+            }
+            return value;
         }
 
         protected virtual bool UpdateGameEntities(string propertyName)
@@ -221,7 +219,6 @@ namespace Editor.Components
         {
             _enableUpdates = false;
             UpdateMSGameEntity();
-            MakeComponentList();
             _enableUpdates = true;
         }
     }

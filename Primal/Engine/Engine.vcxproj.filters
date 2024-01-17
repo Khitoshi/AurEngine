@@ -20,9 +20,13 @@
     <ClInclude Include="Utilities\Utilities.h" />
     <ClInclude Include="EngineAPI\GameEntity.h" />
     <ClInclude Include="EngineAPI\TransfromComponent.h" />
+    <ClInclude Include="Components\Script.h" />
+    <ClInclude Include="EngineAPI\ScriptComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Components\Entity.cpp" />
     <ClCompile Include="Components\Transform.cpp" />
+    <ClCompile Include="Components\Script.cpp" />
+    <ClCompile Include="Core\Main.cpp" />
   </ItemGroup>
 </Project>

@@ -52,7 +52,7 @@ namespace aur {
 #define REGISTER_SCRIPT(TYPE)                               \
         class TYPE;                                         \
         namespace {                                         \
-        const u8 _reg##TYPE                                 \
+        const u8 _reg_##TYPE                                \
         { aur::script::detail::register_script(				\
               aur::script::detail::string_hash()(#TYPE),	\
               &aur::script::detail::create_script<TYPE>) };	\

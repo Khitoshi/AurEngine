@@ -29,13 +29,13 @@ namespace Editor.GameProject
         public required Byte[] Screenshot { get; set; }
         public required string ScreenshotFilePath { get; set; }
         public required string ProjectFilePath { get; set; }
+        public string TemplatePath { get; set; }
     }
 
     internal class NewProject : ViewModelBase
     {
         //TODO: get the path from the installation location
         private readonly string _templatePath = @"..\..\Editor\ProjectTemplates\";
-
         private string _projectName = "NewProject";
         public string ProjectName
         {
@@ -125,16 +125,28 @@ namespace Editor.GameProject
         public NewProject()
         {
             ProjectTemplates = new ReadOnlyObservableCollection<ProjectTemplate>(_projectTemplates);
-
             try
             {
-                InitializeTemplates();
-                SetupValidation();
+                var templatesFiles = Directory.GetFiles(_templatePath, "template.xml", SearchOption.AllDirectories);
+                Debug.Assert(templatesFiles.Any());
+                foreach (var file in templatesFiles)
+                {
+                    var template = Serializer.FromFile<ProjectTemplate>(file);
+                    template.IconFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "Icon.png"));
+                    template.Icon = File.ReadAllBytes(template.IconFilePath);
+                    template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "Screenshot.png"));
+                    template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
+                    template.ProjectFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), template.ProjectFile));
+                    template.TemplatePath = Path.GetDirectoryName(file);
+
+                    _projectTemplates.Add(template);
+                }
+                ValidateProjectPath();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Logger.Log(MessageType.Error, $"Failed to create {ProjectName}");
+                Logger.Log(MessageType.Error, $"Failed to read project templates");
                 throw;
             }
         }
@@ -230,22 +242,23 @@ namespace Editor.GameProject
 
             try
             {
-                //create the project folder structure
-                if (Directory.Exists(path)) Directory.CreateDirectory(path);
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 foreach (var folder in template.Folders)
                 {
                     Directory.CreateDirectory(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), folder)));
                 }
-
-                //copy the icon, screenshot and project file
                 var dirInfo = new DirectoryInfo(path + @".Primal\");
                 dirInfo.Attributes |= FileAttributes.Hidden;
-                File.Copy(template.IconFilePath, Path.GetFullPath((Path.Combine(Path.GetDirectoryName(dirInfo.FullName), "Icon.png"))));
-                File.Copy(template.ScreenshotFilePath, Path.GetFullPath((Path.Combine(Path.GetDirectoryName(dirInfo.FullName), "Screenshot.png"))));
+                File.Copy(template.IconFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Icon.png")));
+                File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
+
                 var projectXml = File.ReadAllText(template.ProjectFilePath);
                 projectXml = string.Format(projectXml, ProjectName, ProjectPath);
-                var projectPath = Path.GetFullPath(Path.Combine(Path.Combine(path, $"{ProjectName}{Project.Extension}")));
+                var projectPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
                 File.WriteAllText(projectPath, projectXml);
+
+                CreateMSVCSolution(template, path);
+
                 return path;
             }
             catch (Exception ex)
@@ -254,6 +267,27 @@ namespace Editor.GameProject
                 Logger.Log(MessageType.Error, $"Failed to Create to {ProjectName}");
                 throw;
             }
+        }
+
+        private void CreateMSVCSolution(ProjectTemplate template, string projectPath)
+        {
+            Debug.Assert(File.Exists(Path.Combine(template.TemplatePath, "MSVCSolution")));
+            Debug.Assert(File.Exists(Path.Combine(template.TemplatePath, "MSVCProject")));
+
+            var engineAPIPath = Path.Combine(MainWindow.PrimalPath, @"Engine\EngineAPI\");
+            Debug.Assert(Directory.Exists(engineAPIPath));
+
+            var _0 = ProjectName;
+            var _1 = "{" + Guid.NewGuid().ToString().ToUpper() + "}";
+            var _2 = engineAPIPath;
+            var _3 = MainWindow.PrimalPath;
+
+            var solution = File.ReadAllText(Path.Combine(template.TemplatePath, "MSVCSolution"));
+            solution = string.Format(solution, _0, _1, "{" + Guid.NewGuid().ToString().ToUpper() + "}");
+            File.WriteAllText(Path.GetFullPath(Path.Combine(projectPath, $"{_0}.sln")), solution);
+            var project = File.ReadAllText(Path.Combine(template.TemplatePath, "MSVCProject"));
+            project = string.Format(project, _0, _1, _2, _3);
+            File.WriteAllText(Path.GetFullPath(Path.Combine(projectPath, $@"GameCode\{_0}.vcxproj")), project);
         }
 
     }

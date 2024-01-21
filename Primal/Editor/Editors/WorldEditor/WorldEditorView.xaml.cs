@@ -1,4 +1,5 @@
-﻿using Editor.GameProject;
+﻿using Editor.GameDev;
+using Editor.GameProject;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -32,6 +33,11 @@ namespace Editor.Editors
         {
             Loaded -= WorldEditorView_Loaded;
             Focus();
+        }
+
+        private void OnNewScript_Button_Click(object sender, RoutedEventArgs e)
+        {
+            new NewScriptDialog().ShowDialog();
         }
     }
 }

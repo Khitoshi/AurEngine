@@ -19,6 +19,7 @@ namespace Editor
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static string PrimalPath { get; private set; } = @"D:\Study\Engine\AurEngine\Primal";
         public MainWindow()
         {
             InitializeComponent();

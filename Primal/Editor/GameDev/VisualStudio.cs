@@ -13,7 +13,7 @@ namespace Editor.GameDev
     static class VisualStudio
     {
         private static EnvDTE80.DTE2? _vsInstance = null;
-        private static readonly string _progID = "VisualStudio.DTE";
+        private static readonly string _progID = "VisualStudio.DTE.17.0";
 
         [DllImport("ole32.dll")]
         private static extern int CreateBindCtx(uint reserved, out IBindCtx ppbc);
@@ -113,10 +113,13 @@ namespace Editor.GameDev
                     }
 
                     var cpp = files.FirstOrDefault(x => Path.GetExtension(x) == ".cpp");
+                    var hpp = files.FirstOrDefault(x => Path.GetExtension(x) == ".h");
                     if (!string.IsNullOrEmpty(cpp))
                     {
-                        //_vsInstance.ItemOperations.OpenFile(cpp, EnvDTE.Constants.vsViewKindTextView).Visible = true;
-                        _vsInstance.ItemOperations.OpenFile(cpp, "TextView").Visible = true;
+                        //hpp and cpp are opened in the same window
+                        _vsInstance.ExecuteCommand("File.OpenFile", cpp);
+                        _vsInstance.ExecuteCommand("File.OpenFile", hpp);
+
                     }
                     _vsInstance.MainWindow.Activate();
                     _vsInstance.MainWindow.Visible = true;

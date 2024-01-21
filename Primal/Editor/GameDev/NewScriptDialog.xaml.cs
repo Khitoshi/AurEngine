@@ -24,6 +24,7 @@ namespace Editor.GameDev
     /// </summary>
     public partial class NewScriptDialog : Window
     {
+        //TODO: To be formatted to read from a text file.
         private static readonly string _cppCode = @"#include ""{0}.h""
 namespace {1} {{
 REGISTER_SCRIPT({0});
@@ -37,11 +38,11 @@ void {0}::update(float dt)
 
         private static readonly string _hCode = @"#pragma once
 namespace {1} {{
-class {0} : public primal::script::entity_script
+class {0} : public aur::script::entity_script
 {{
 public:
-    constexpr explicit {0}(primal::game_entity::entity entity)
-        : primal::script::entity_script{{entity}} {{}}
+    constexpr explicit {0}(aur::game_entity::entity entity)
+        : aur::script::entity_script{{entity}} {{}}
     void begin_play() override;
     void update(float dt) override;
 private:

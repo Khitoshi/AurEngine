@@ -30,13 +30,13 @@ namespace Editor.GameProject
         public required string ScreenshotFilePath { get; set; }
         public required string ProjectFilePath { get; set; }
         public string? TemplatePath { get; set; }
+
     }
 
     internal class NewProject : ViewModelBase
     {
         //TODO: get the path from the installation location
         private readonly string _templatePath = @"..\..\Editor\ProjectTemplates\";
-
         private string _projectName = "NewProject";
         public string ProjectName
         {
@@ -139,7 +139,6 @@ namespace Editor.GameProject
                     template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(template.TemplatePath, "Screenshot.png"));
                     template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
                     template.ProjectFilePath = Path.GetFullPath(Path.Combine(template.TemplatePath, template.ProjectFile));
-
                     _projectTemplates.Add(template);
                 }
                 ValidateProjectPath();

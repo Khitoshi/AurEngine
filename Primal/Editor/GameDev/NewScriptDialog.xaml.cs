@@ -60,6 +60,7 @@ private:
 
         private static string GetNamespaceFromProjectName()
         {
+            //Spaces are not allowed in project names, so replaced them with _.
             var projectName = Project.Current.Name;
             projectName = projectName.Replace(' ', '_');
             return projectName;
@@ -129,6 +130,8 @@ private:
         {
             if (!Validate()) return;
             IsEnabled = false;
+
+            //visible --> hidden animation
             busyAnimation.Opacity = 0;
             busyAnimation.Visibility = Visibility.Visible;
             DoubleAnimation fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(500)));
@@ -136,6 +139,7 @@ private:
 
             try
             {
+                //create script files
                 var name = scriptName.Text.Trim();
                 var path = Path.GetFullPath(Path.Combine(Project.Current.Path, scriptPath.Text.Trim()));
                 var solution = Project.Current.Solution;
@@ -149,6 +153,7 @@ private:
             }
             finally
             {
+                //hidden --> visible animation
                 DoubleAnimation fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromMilliseconds(200)));
                 fadeOut.Completed += (s, e) =>
                 {
@@ -164,13 +169,13 @@ private:
         {
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
+            // writedown the cpp and h files
             var cpp = Path.GetFullPath(Path.Combine(path, $"{name}.cpp"));
-            var h = Path.GetFullPath(Path.Combine(path, $"{name}.h"));
-
             using (var sw = File.CreateText(cpp))
             {
                 sw.Write(string.Format(_cppCode, name, _namespace));
             }
+            var h = Path.GetFullPath(Path.Combine(path, $"{name}.h"));
             using (var sw = File.CreateText(h))
             {
                 sw.Write(string.Format(_hCode, name, _namespace));
@@ -178,6 +183,7 @@ private:
 
             string[] files = new string[] { cpp, h };
 
+            //If it fails once, wait 1 second and retry up to 3 times
             for (int i = 0; i < 3; ++i)
             {
                 if (!VisualStudio.AddFilesToSolution(solution, projectName, files)) System.Threading.Thread.Sleep(1000);

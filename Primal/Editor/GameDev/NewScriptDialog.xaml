@@ -15,8 +15,7 @@
 
         <Grid Margin="32,0">
             <!-- Busy animation -->
-            <Grid HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Hidden"
-              x:Name="busyAnimation">
+            <Grid HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Hidden" x:Name="busyAnimation">
                 <Grid.Resources>
                     <SolidColorBrush Color="{StaticResource Editor.FontColor}" x:Key="busyBrush"/>
                 </Grid.Resources>
@@ -33,8 +32,7 @@
                         <EventTrigger RoutedEvent="Loaded">
                             <BeginStoryboard>
                                 <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetProperty="(Ellipse.RenderTransform).(RotateTransform.Angle)" 
-                                                     To="-360" Duration="0:0:2" RepeatBehavior="Forever"/>
+                                    <DoubleAnimation Storyboard.TargetProperty="(Ellipse.RenderTransform).(RotateTransform.Angle)" To="-360" Duration="0:0:2" RepeatBehavior="Forever"/>
                                 </Storyboard>
                             </BeginStoryboard>
                         </EventTrigger>

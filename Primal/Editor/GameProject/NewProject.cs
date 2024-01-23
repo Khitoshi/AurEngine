@@ -29,7 +29,8 @@ namespace Editor.GameProject
         public required Byte[] Screenshot { get; set; }
         public required string ScreenshotFilePath { get; set; }
         public required string ProjectFilePath { get; set; }
-        public string TemplatePath { get; set; }
+        public string? TemplatePath { get; set; }
+
     }
 
     internal class NewProject : ViewModelBase
@@ -132,13 +133,12 @@ namespace Editor.GameProject
                 foreach (var file in templatesFiles)
                 {
                     var template = Serializer.FromFile<ProjectTemplate>(file);
-                    template.IconFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "Icon.png"));
-                    template.Icon = File.ReadAllBytes(template.IconFilePath);
-                    template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), "Screenshot.png"));
-                    template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
-                    template.ProjectFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(file), template.ProjectFile));
                     template.TemplatePath = Path.GetDirectoryName(file);
-
+                    template.IconFilePath = Path.GetFullPath(Path.Combine(template.TemplatePath, "Icon.png"));
+                    template.Icon = File.ReadAllBytes(template.IconFilePath);
+                    template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(template.TemplatePath, "Screenshot.png"));
+                    template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
+                    template.ProjectFilePath = Path.GetFullPath(Path.Combine(template.TemplatePath, template.ProjectFile));
                     _projectTemplates.Add(template);
                 }
                 ValidateProjectPath();
@@ -149,36 +149,6 @@ namespace Editor.GameProject
                 Logger.Log(MessageType.Error, $"Failed to read project templates");
                 throw;
             }
-        }
-
-        private void InitializeTemplates()
-        {
-            var templateFiles = Directory.GetFiles(_templatePath, "template.xml", SearchOption.AllDirectories);
-            Debug.Assert(templateFiles.Any());
-
-            foreach (var file in templateFiles)
-            {
-                var template = LoadTemplate(file);
-                if (template != null) _projectTemplates.Add(template);
-            }
-        }
-
-        private ProjectTemplate LoadTemplate(string file)
-        {
-            if (String.IsNullOrEmpty(file)) return null;
-
-            var filePath = Path.GetDirectoryName(file);
-            if (String.IsNullOrEmpty(filePath)) return null;
-
-            //get the icon ,screenshot and project file
-            var template = Serializer.FromFile<ProjectTemplate>(file);
-            template.IconFilePath = Path.GetFullPath(Path.Combine(filePath, "Icon.png"));
-            template.Icon = File.ReadAllBytes(template.IconFilePath);
-            template.ScreenshotFilePath = Path.GetFullPath(Path.Combine(filePath, "Screenshot.png"));
-            template.Screenshot = File.ReadAllBytes(template.ScreenshotFilePath);
-            template.ProjectFilePath = Path.GetFullPath(Path.Combine(filePath, template.ProjectFile));
-
-            return template;
         }
 
         private void SetupValidation()
@@ -253,7 +223,7 @@ namespace Editor.GameProject
                 File.Copy(template.ScreenshotFilePath, Path.GetFullPath(Path.Combine(dirInfo.FullName, "Screenshot.png")));
 
                 var projectXml = File.ReadAllText(template.ProjectFilePath);
-                projectXml = string.Format(projectXml, ProjectName, ProjectPath);
+                projectXml = string.Format(projectXml, ProjectName, path);
                 var projectPath = Path.GetFullPath(Path.Combine(path, $"{ProjectName}{Project.Extension}"));
                 File.WriteAllText(projectPath, projectXml);
 
@@ -264,7 +234,7 @@ namespace Editor.GameProject
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Logger.Log(MessageType.Error, $"Failed to Create to {ProjectName}");
+                Logger.Log(MessageType.Error, $"Failed to create {ProjectName}");
                 throw;
             }
         }

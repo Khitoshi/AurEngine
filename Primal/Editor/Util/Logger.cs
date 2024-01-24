@@ -51,19 +51,6 @@ namespace Editor.Util
                 var type = (int)(e.Item as LogMessage).MessageType;
                 e.Accepted = (type & _messageFilter) != 0;
             };
-
-            Log(MessageType.Error, "Test Error Message01");
-            Log(MessageType.Info, "Test Info Message01");
-            Log(MessageType.Warning, "Test Warning Message01");
-
-            Log(MessageType.Error, "Test Error Message02");
-            Log(MessageType.Info, "Test Info Message02");
-            Log(MessageType.Warning, "Test Warning Message02");
-
-            Log(MessageType.Error, "Test Error Message03");
-            Log(MessageType.Info, "Test Info Message03");
-            Log(MessageType.Warning, "Test Warning Message03");
-
         }
 
         public static async void Log(MessageType type, string msg,
@@ -89,7 +76,5 @@ namespace Editor.Util
             _messageFilter = mask;
             FilteredMessages.View.Refresh();
         }
-
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using Editor.GameDev;
+﻿using Editor.DllWrappers;
+using Editor.GameDev;
 using Editor.Util;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,15 @@ using System.Windows.Input;
 
 namespace Editor.GameProject
 {
+
+    enum BuildConfiguration
+    {
+        Debug,
+        DebugEditor,
+        Release,
+        ReleaseEditor,
+    }
+
     [DataContract(Name = "Game")]
     class Project : ViewModelBase
     {
@@ -27,6 +37,28 @@ namespace Editor.GameProject
 
         public string FullPath => $@"{Path}{Name}{Extension}";
         public string Solution => $@"{Path}{Name}.sln";
+
+        private static readonly string[] _buildConfigurationNames = new string[] { "Debug", "DebugEditor", "Release", "ReleaseEditor" };
+
+
+        private int _buildConfig;
+        [DataMember]
+        public int BuildConfig
+        {
+            get => _buildConfig;
+            set
+            {
+                if (_buildConfig != value)
+                {
+                    _buildConfig = value;
+                    OnPropertyChanged(nameof(BuildConfig));
+                }
+            }
+        }
+
+        public BuildConfiguration StandAloneBuildConfig => BuildConfig == 0 ? BuildConfiguration.Debug : BuildConfiguration.Release;
+        public BuildConfiguration DllBuildConfig => BuildConfig == 0 ? BuildConfiguration.DebugEditor : BuildConfiguration.ReleaseEditor;
+        private static string GetConfigurationName(BuildConfiguration config) => _buildConfigurationNames[(int)config];
 
         [DataMember(Name = "Scenes")]
         private ObservableCollection<Scene> _scenes = [];
@@ -52,10 +84,10 @@ namespace Editor.GameProject
 
         public ICommand UndoCommand { get; private set; }
         public ICommand RedoCommand { get; private set; }
-
         public ICommand AddSceneCommand { get; private set; }
         public ICommand RemoveSceneCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
+        public ICommand BuildCommand { get; private set; }
 
         public Project(string name, string path)
         {
@@ -82,48 +114,6 @@ namespace Editor.GameProject
             Logger.Log(MessageType.Info, $"Project saved to {project.FullPath}");
         }
 
-        [OnDeserialized]
-        private void OnDeserialized(StreamingContext context)
-        {
-            if (_scenes != null)
-            {
-                Scenes = new ReadOnlyObservableCollection<Scene>(_scenes);
-                OnPropertyChanged(nameof(Scenes));
-            }
-
-            ActiveScene = Scenes.FirstOrDefault(x => x.IsActive);
-
-            AddSceneCommand = new RelayCommand<object>(x =>
-            {
-                AddScene($"New Scene {_scenes.Count}");
-                var newScene = _scenes.Last();
-                var sceneIndex = _scenes.Count - 1;
-
-                UndoRedo.Add(new UndoRedoAction(
-                    () => RemoveScene(newScene),
-                    () => _scenes.Insert(sceneIndex, newScene),
-                    $"Add {newScene.Name}")
-                );
-            });
-
-            RemoveSceneCommand = new RelayCommand<Scene>(x =>
-            {
-                var sceneIndex = _scenes.IndexOf(x);
-                RemoveScene(x);
-
-                UndoRedo.Add(new UndoRedoAction(
-                    () => _scenes.Insert(sceneIndex, x),
-                    () => RemoveScene(x),
-                    $"Remove {x.Name}")
-                    );
-
-            }, x => !x.IsActive);
-
-            UndoCommand = new RelayCommand<object>(x => UndoRedo.Undo());
-            RedoCommand = new RelayCommand<object>(x => UndoRedo.Redo());
-            SaveCommand = new RelayCommand<object>(x => Save(this));
-        }
-
         private void AddScene(string sceneName)
         {
             Debug.Assert(!string.IsNullOrEmpty(sceneName.Trim()));
@@ -134,6 +124,102 @@ namespace Editor.GameProject
         {
             Debug.Assert(_scenes.Contains(scene));
             _scenes.Remove(scene);
+        }
+
+        private async Task BuildGameCodeDll(bool showWindow = true)
+        {
+            try
+            {
+                // The reason for unloading the DLL is that if you build with the DLL loaded, the DLL will remain loaded when the build fails.
+                UnloadGameCodeDll();
+
+                await Task.Run(() => VisualStudio.BuildSolution(this, GetConfigurationName(DllBuildConfig), showWindow));
+                if (VisualStudio.BuildSucceeded)
+                {
+                    LoadGameCodeDll();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+        private void LoadGameCodeDll()
+        {
+            var configName = GetConfigurationName(DllBuildConfig);
+            var dll = $@"{Path}x64\{configName}\{Name}.dll";
+            if (File.Exists(dll) && EngineAPI.LoadGameCodeDll(dll) != 0)
+            {
+                Logger.Log(MessageType.Info, "Game code DLL loaded successfully.");
+            }
+            else
+            {
+                Logger.Log(MessageType.Warning, "Failed to load game code DLL file. Try to build the project first.");
+            }
+        }
+
+        private void UnloadGameCodeDll()
+        {
+            if (EngineAPI.UnloadGameCodeDll() != 0)
+            {
+                Logger.Log(MessageType.Info, "Game code DLL unloaded");
+            }
+        }
+
+        private void SetCommands()
+        {
+            AddSceneCommand = new RelayCommand<object>(x =>
+            {
+                AddScene($"New Scene {_scenes.Count}");
+                var newScene = _scenes.Last();
+                var sceneIndex = _scenes.Count - 1;
+                UndoRedo.Add(new UndoRedoAction(
+                    () => RemoveScene(newScene),
+                    () => _scenes.Insert(sceneIndex, newScene),
+                    $"Add {newScene.Name}"));
+            });
+
+            RemoveSceneCommand = new RelayCommand<Scene>(x =>
+            {
+                var sceneIndex = _scenes.IndexOf(x);
+                RemoveScene(x);
+                UndoRedo.Add(new UndoRedoAction(
+                    () => _scenes.Insert(sceneIndex, x),
+                    () => RemoveScene(x),
+                    $"Remove {x.Name}"));
+            }, x => !x.IsActive);
+
+            UndoCommand = new RelayCommand<object>(x => UndoRedo.Undo(), x => UndoRedo.UndoList.Any());
+            RedoCommand = new RelayCommand<object>(x => UndoRedo.Redo(), x => UndoRedo.RedoList.Any());
+            SaveCommand = new RelayCommand<object>(x => Save(this));
+            BuildCommand = new RelayCommand<bool>(async x => await BuildGameCodeDll(x), x => !VisualStudio.IsDebugging() && VisualStudio.BuildDone);
+
+            // If the UI is displayed before the asynchronous processing is completed,
+            // OnPropertyChanged is performed because the UI may be presented to the user without reflecting the result of asynchronous processing in the UI.
+            // Therefore, OnPropertyChanged must be called to convey the new data to the UI.
+            OnPropertyChanged(nameof(AddSceneCommand));
+            OnPropertyChanged(nameof(RemoveSceneCommand));
+            OnPropertyChanged(nameof(UndoCommand));
+            OnPropertyChanged(nameof(RedoCommand));
+            OnPropertyChanged(nameof(SaveCommand));
+            OnPropertyChanged(nameof(BuildCommand));
+        }
+
+        [OnDeserialized]
+        private async void OnDeserialized(StreamingContext context)
+        {
+            if (_scenes != null)
+            {
+                Scenes = new ReadOnlyObservableCollection<Scene>(_scenes);
+                OnPropertyChanged(nameof(Scenes));
+            }
+            ActiveScene = Scenes.FirstOrDefault(x => x.IsActive);
+
+            await BuildGameCodeDll(false);
+
+            SetCommands();
         }
     }
 }
